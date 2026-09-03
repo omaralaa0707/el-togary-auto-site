@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+@theme {
+  /*
+   * Their own identity is achromatic — a near-black studio, a white
+   * wordmark, a steel badge — with no brand colour anywhere in the feed.
+   * So the page stays achromatic too, and spends its one invented accent
+   * strictly on marking which register is showing: platinum steel for the
+   * showroom side (their own badge-rim colour), copper for the finance
+   * desk (an urgency this page adds, not theirs).
+   */
+  --color-ground: #121110; /* the studio */
+  --color-ground-2: #1b1918; /* raised card */
+  --color-ground-3: #262320; /* rules only — never text */
+  --color-cream: #eeece9; /* 16.0:1 on ground */
+  --color-cream-2: #b4b0aa; /* 8.7:1 on ground */
+  --color-cream-3: #8a857d; /* 5.2:1 on ground — the faintest text allowed */
+  --color-steel: #c7c9cc; /* the showroom register: 11.4:1 on ground */
+  --color-copper: #d98a3d; /* the finance register: 6.9:1 on ground */
+
+  --font-display: var(--font-domine), Georgia, serif;
+  --font-body: var(--font-figtree), system-ui, sans-serif;
+  --font-arabic-display: var(--font-jomhuria), "Segoe UI", sans-serif;
+  --font-arabic-body: var(--font-tajawal), system-ui, sans-serif;
+
+  --text-hero: clamp(2rem, 5vw, 3.9rem);
+  --text-display: clamp(1.5rem, 3vw, 2.4rem);
+  --text-lead: clamp(0.98rem, 1.1vw, 1.12rem);
+
+  /* A coin does not ease to a stop — it settles with a small, decaying
+     wobble, the way a spun disc actually comes to rest. */
+  --ease-settle: cubic-bezier(0.18, 0.9, 0.32, 1);
+}
+
+@layer base {
+  section[id] { scroll-margin-top: 5.5rem; }
+
+  html {
+    background: var(--color-ground);
+    color: var(--color-cream);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: auto;
+  }
+
+  body { font-family: var(--font-body); overflow-x: hidden; }
+  html[dir="rtl"] body { font-family: var(--font-arabic-body); }
+
+  ::selection { background: var(--color-copper); color: var(--color-ground); }
+  :focus-visible { outline: 2px solid var(--color-steel); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility font-display { font-family: var(--font-display); }
+html[dir="rtl"] .font-display { font-family: var(--font-arabic-display); }
+
+@utility label {
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+html[dir="rtl"] .label {
+  font-family: var(--font-arabic-display);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 1rem;
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion signature: settle.
+ *
+ * The whole page turns on one coin, so content arrives the way the coin
+ * itself comes to rest — a small rotation past true that decays back to
+ * flat, rather than a slide or a fade.
+ * ------------------------------------------------------------------------ */
+
+@keyframes settle-in {
+  from { opacity: 0; transform: perspective(600px) rotateY(-14deg) scale(0.97); }
+  60% { opacity: 1; }
+  to { opacity: 1; transform: perspective(600px) rotateY(0deg) scale(1); }
+}
+@keyframes rule-settle { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes settle-in { from { opacity: 1; transform: none; } to { opacity: 1; transform: none; } }
+  @keyframes rule-settle { from { transform: none; } to { transform: none; } }
+}
+
+[data-settle] { opacity: 0; }
+[data-settle][data-seen] {
+  animation: settle-in 560ms var(--ease-settle) var(--settle-delay, 0ms) both;
+}
+html[dir="rtl"] [data-settle][data-seen] { animation-name: settle-in-rtl; }
+@keyframes settle-in-rtl {
+  from { opacity: 0; transform: perspective(600px) rotateY(14deg) scale(0.97); }
+  60% { opacity: 1; }
+  to { opacity: 1; transform: perspective(600px) rotateY(0deg) scale(1); }
+}
+
+[data-settle-rule] { transform: scaleX(0); }
+[data-settle-rule][data-seen] {
+  animation: rule-settle 460ms var(--ease-settle) var(--settle-delay, 0ms) both;
+}
+
+/* ---------------------------------------------------------------------------
+ * Arabic corrections. Keyed off [dir], never [lang] — browser translation
+ * rewrites lang. Unlayered so they outrank Tailwind utilities.
+ * ------------------------------------------------------------------------ */
+
+html[dir="ltr"] .text-hero { line-height: 1.06; }
+html[dir="rtl"] .text-hero {
+  font-size: clamp(2.6rem, 7vw, 5.4rem);
+  /* Jomhuria is an extremely condensed display face — set noticeably
+     larger than the Latin cut and with generous leading, or it reads as
+     a thin wisp of a headline rather than a display weight. */
+  line-height: 1.35;
+  font-weight: 400;
+}
+html[dir="ltr"] .text-display { line-height: 1.1; }
+html[dir="rtl"] .text-display {
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  line-height: 1.3;
+}
+
+html[dir="rtl"] [class*="tracking-["],
+html[dir="rtl"] .tracking-widest,
+html[dir="rtl"] .tracking-wider { letter-spacing: 0; }
+
+.fine { font-size: 0.78rem; line-height: 1.6; }
+html[dir="rtl"] .fine { font-size: 0.86rem; line-height: 1.85; }
+
+html[dir="rtl"] .text-lead { font-size: clamp(1.02rem, 1.15vw, 1.16rem); line-height: 1.95; }
+
+/* Marque names, model codes, figures and phone numbers stay Latin and LTR
+   inside Arabic copy — "01030061000" must not reorder its digits. */
+.latin {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-family: var(--font-body);
+}
+html[dir="rtl"] .latin { text-align: right; }
