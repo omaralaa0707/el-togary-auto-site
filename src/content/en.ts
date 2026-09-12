@@ -97,8 +97,7 @@ export const en: TogaryContent = {
   },
 
   footer: {
-    disclaimer: "A concept design, built as a demonstration. Not an official El Togary Auto site, and not affiliated with them. All photography, marks and quoted copy belong to El Togary Auto.",
-    rights: "Concept by Claude",
+    rights: "© El Togary Auto. All rights reserved.",
   },
 
   a11y: {
